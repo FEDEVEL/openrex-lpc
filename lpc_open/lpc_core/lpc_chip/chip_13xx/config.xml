@@ -1,0 +1,19 @@
+<LPCOpenCfg>
+	<symbol name="varChipConfigDir" value="${varChipLibSrcDir}/config_${prjChipName}"/>
+	<symbol name="varCPUCore" value="m3"/>
+	<module name="core_${varCPUCore}"/>
+	<template section="filelist" name="${varChipLibName}" tool="xpresso">
+		<import src="${varChipConfigDir}" dest="inc">
+			<include>*.h</include>
+		</import>
+	</template>
+	<template section="import" name="${varChipLibName}_inc1" tool="xpresso">
+		<copy>../chip_common/error.h</copy>
+		<copy>../chip_common/stopwatch.h</copy>
+	</template>
+	<template section="cfglist" name="${varChipLibName}" tool="xpresso">
+		<import src="${varChipLibSrcDir}/../usbd_rom" dest="usbd_rom/inc">
+			<include>*.h</include>
+		</import>
+	</template>
+</LPCOpenCfg>
