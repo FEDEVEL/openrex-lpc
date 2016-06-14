@@ -28,3 +28,12 @@ void* memcpy(void *destination, const void *source, uint32_t num)
 	return destination;
 }
 
+void* memset(void *destination, int value, uint32_t num)
+{
+	for (int i = 0; i < num; i++)
+	{
+		((uint8_t*)destination)[i] = value;
+	}
+	return destination;
+}
+

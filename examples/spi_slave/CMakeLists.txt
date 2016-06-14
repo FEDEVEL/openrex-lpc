@@ -13,7 +13,7 @@ set(CMAKE_CXX_COMPILER ${CROSS_COMPILE}g++)
 ##############################################################################
 # project settings
 ##############################################################################
-set(PROJECT_NAME spi.elf)
+set(PROJECT_NAME spi_slave.elf)
 cmake_minimum_required(VERSION 2.8.11)
 project(${PROJECT_NAME})
 enable_language(ASM)
