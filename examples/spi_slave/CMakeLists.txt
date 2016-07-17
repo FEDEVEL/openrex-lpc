@@ -84,6 +84,8 @@ add_custom_target(${PROJECT_NAME}_bin ALL DEPENDS ${PROJECT_NAME}.bin)
 ##############################################################################
 # produce debug symbols
 set(COMMON_FLAGS "${COMMON_FLAGS} -g")
+# produce warnings
+set(COMMON_FLAGS "${COMMON_FLAGS} -Wall")
 # use c99 standard with gnu extensions
 set(COMMON_FLAGS "${COMMON_FLAGS} -std=gnu99")
 # cpu is 'cortex-m3' architecture

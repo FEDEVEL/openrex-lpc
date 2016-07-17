@@ -13,7 +13,7 @@ set(CMAKE_CXX_COMPILER ${CROSS_COMPILE}g++)
 ##############################################################################
 # project settings
 ##############################################################################
-set(PROJECT_NAME skeleton.elf)
+set(PROJECT_NAME spi_canvas.elf)
 cmake_minimum_required(VERSION 2.8.11)
 project(${PROJECT_NAME})
 enable_language(ASM)
@@ -60,6 +60,9 @@ add_executable(
     "${LPC_OPEN_DIR}/init/cr_startup_lpc13xx.c"
     "${LPC_OPEN_DIR}/init/utils.c"
 # app
+    "${CMAKE_CURRENT_SOURCE_DIR}/canvas.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/commands.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/commands.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/main.c"
 )
 
