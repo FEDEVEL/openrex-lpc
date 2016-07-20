@@ -59,7 +59,7 @@ help_param_t help_param = {
 void led_on(command_t *led_command)
 {
     led_param_t *led_param = (led_param_t*)led_command->param;
-    Board_LED_Set(led_param->led, true);
+    Board_LED_SetLevel(led_param->led, true);
     Board_UARTPutSTR(EXAMPLE_TTY_LEAD);
     Board_UARTPutSTR(led_param->name);
     Board_UARTPutSTR(" has turned on\n");
@@ -69,7 +69,7 @@ void led_on(command_t *led_command)
 void led_off(struct command *led_command)
 {
     led_param_t *led_param = (led_param_t*)led_command->param;
-    Board_LED_Set(led_param->led, false);
+    Board_LED_SetLevel(led_param->led, false);
     Board_UARTPutSTR(EXAMPLE_TTY_LEAD);
     Board_UARTPutSTR(led_param->name);
     Board_UARTPutSTR(" has turned off\n");
@@ -82,7 +82,7 @@ void leds_on(struct command *led_command)
     uint32_t count = sizeof(leds)/sizeof(pinmux_t);
     for (int i = 0; i < count; i++)
     {
-        Board_LED_Set(leds[i], true);
+        Board_LED_SetLevel(leds[i], true);
     }
     Board_UARTPutSTR(EXAMPLE_TTY_LEAD);
     Board_UARTPutSTR("all leds have turned on\n");
@@ -95,7 +95,7 @@ void leds_off(struct command *led_command)
     uint32_t count = sizeof(leds)/sizeof(pinmux_t);
     for (int i = 0; i < count; i++)
     {
-        Board_LED_Set(leds[i], false);
+        Board_LED_SetLevel(leds[i], false);
     }
     Board_UARTPutSTR(EXAMPLE_TTY_LEAD);
     Board_UARTPutSTR("all leds have turned off\n");

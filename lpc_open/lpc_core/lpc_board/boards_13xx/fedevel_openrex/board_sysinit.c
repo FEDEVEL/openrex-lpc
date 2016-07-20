@@ -59,7 +59,7 @@ STATIC const PINMUX_GRP_T pinmuxing[] = {
 #if (defined(ONBOARD_LED_D4) && defined(ONBOARDCF_LED_D4))
     {TO_PORT(ONBOARD_LED_D4), TO_PIN(ONBOARD_LED_D4), ONBOARDCF_LED_D4},
 #endif
-#if (defined(ONBOARD_LED_D24) && defined(ONBOARDCF_LED_D24))
+#if 0 && (defined(ONBOARD_LED_D24) && defined(ONBOARDCF_LED_D24))
     {TO_PORT(ONBOARD_LED_D24), TO_PIN(ONBOARD_LED_D24), ONBOARDCF_LED_D24},
 #endif
 #if (defined(ONBOARD_SPI0_CS) && defined(ONBOARDCF_SPI0_CS))
@@ -79,6 +79,9 @@ STATIC const PINMUX_GRP_T pinmuxing[] = {
 #endif
 #if (defined(ONBOARD_UART_TX) && defined(ONBOARDCF_UART_TX))
     {TO_PORT(ONBOARD_UART_TX), TO_PIN(ONBOARD_UART_TX), ONBOARDCF_UART_TX},
+#endif
+#if (defined(ONBOARD_BTN_SW2) && defined(ONBOARDCF_BTN_SW2))
+    {TO_PORT(ONBOARD_BTN_SW2), TO_PIN(ONBOARD_BTN_SW2), ONBOARDCF_BTN_SW2},
 #endif
 };
 

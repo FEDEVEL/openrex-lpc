@@ -21,122 +21,106 @@
  */
 
 #include <string.h>
+#include "assert.h"
 #include "chip.h"
 #include "board.h"
-#include "canvas.h"
+#include "canvas_common.h"
 #include "commands.h"
 
-/*
- * Note: SSP in master mode toogle CS after each transmited word.
- *       In slave mode, it receives only one word per CS active.
- */
-
-// In case app does not provide any data
-// for SPI - we have to fill/read dummy pattern
-void SSP0_IRQHandler(void)
+void draw_movement(LPC_SSP_T *spi)
 {
-    // read to empty FIFO
-    while (
-        (LPC_SSP0->SR & SSP_STAT_RNE) || (LPC_SSP0->SR & SSP_STAT_TNF)
-    )
-    {
-        if (LPC_SSP0->SR & SSP_STAT_RNE)
-            LPC_SSP0->DR;
-        if (LPC_SSP0->SR & SSP_STAT_TNF)
-            LPC_SSP0->DR = CANVAS_NOCOMMAND_CMD;
-    }
-    //Board_LED_Set(ONBOARD_LED_D3, true);
-}
-
-int32_t draw_movement(LPC_SSP_T *spi)
-{
-    struct canvas_dimension dimension = {
+    struct ack_dimension dimension = {
         .width = 0,
         .height = 0,
     };
-    struct canvas_circle circle = {
+    struct cmd_circle circle = {
         .xpos       = 0,
         .ypos       = 0,
-        .color      = CANVAS_BLACK_COLOR,
+        .color      = CANVAS_COLOR_BLACK,
         .radius     = 50,
         .in_centre  = 1,
     };
     int32_t x_speed = 3, y_speed = 1, color_rotation = 0;
     int32_t x_move = x_speed, y_move = y_speed, color_move = 1;
 
+    assert(NULL != spi);
+
+    /* get screen dimension */
     cmd_get_dimension(spi, &dimension);
 
-    // 'circle.radius' must be smaller than
-    // 'dimension.width' and 'dimension.height'
+    /* 'circle.radius' must be smaller than
+     * 'dimension.width' and 'dimension.height' */
     while (1)
     {
-        // bottom limit
+        /* bottom limit */
         if ((int32_t)(circle.ypos + circle.radius + y_move) > dimension.height)
         {
             y_move = -y_speed;
         }
-        // upper limit
+        /* upper limit */
         if ((int32_t)(circle.ypos - circle.radius + y_move) < 0)
         {
             y_move = y_speed;
         }
-        // right limit
+        /* right limit */
         if ((int32_t)(circle.xpos + circle.radius + x_move) > dimension.width)
         {
             x_move = -x_speed;
         }
-        // left limit
+        /* left limit */
         if ((int32_t)(circle.xpos - circle.radius + x_move) < 0)
         {
             x_move = x_speed;
         }
 
-        // Update color. Each base collor start and ends at 0
+        /* update color. Each 'base color' starts and ends at 0 value */
         if (((circle.color >> color_rotation) & 0xFF) + color_move == 0xFF)
         {
             color_move = -1;
         }
+        /* hit the lower limit - move to next 'base color' */
         if (((circle.color >> color_rotation) & 0xFF) + color_move == 0)
         {
             color_move = 1;
             color_rotation += 8;
         }
+        /* color rotation is invalid - reset back to 0 */
         if (color_rotation == 24)
         {
             color_rotation = 0;
         }
 
-        // update circle attributes
+        /* update circle attributes */
         circle.xpos += x_move;
         circle.ypos += y_move;
         circle.color += color_move << color_rotation;
 
-        // cmd_clear_screen(spi, CANVAS_BLACK_COLOR);
-
-        // send command to draw a circle
+        /* send command to draw a circle */
         cmd_draw_circle(spi, &circle);
+        /* put image on screen */
+        cmd_flush_drawing(spi);
     }
+}
 
-    return 0;
+/* SPI interrupt occours in case txFIFO is half empty
+ * which means that our application doesn't have any data
+ * to send so we have to keep bus idle by sending DUMMY */
+void SSP0_IRQHandler(void)
+{
+    cmd_do_nothing(LPC_SSP0);
 }
 
 int main(void)
 {
+
     SystemCoreClockUpdate();
+    /* Initialize IOCON, GPIO, ... */
     Board_Init();
-
-    Chip_SSP_Init(LPC_SSP0);
-    Chip_SSP_SetMaster(LPC_SSP0, false);
-
-    // Chip_SSP_SetFormat(LPC_SSP, ssp_format.bits, ssp_format.frameFormat, ssp_format.clockMode);
-    Chip_SSP_Int_Enable(LPC_SSP0);
-    Chip_SSP_Enable(LPC_SSP0);
+    /* initialize SPI */
+    initialize_spi(LPC_SSP0);
+    /* enable SPI interrupts */
     NVIC_EnableIRQ(SSP0_IRQn);
-
-    Board_LED_Set(ONBOARD_LED_D1, false);
-    Board_LED_Set(ONBOARD_LED_D2, true);
-    Board_LED_Set(ONBOARD_LED_D3, true);
-
+    /* run main loop */
     draw_movement(LPC_SSP0);
 
     while(1);

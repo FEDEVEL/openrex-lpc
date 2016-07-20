@@ -20,10 +20,11 @@
  *  under the License.
  */
 
+#include "assert.h"
 #include "chip.h"
 #include "board.h"
 
-void delay(uint32_t count)
+void delay(volatile uint32_t count)
 {
     for (;count; count--)
         __asm("nop");
@@ -31,6 +32,8 @@ void delay(uint32_t count)
 
 int main(void)
 {
+    int32_t state = 0;
+    bool btn_active = true;
     pinmux_t leds[] = { ONBOARD_LEDS };
     uint32_t leds_count = sizeof(leds)/(sizeof(pinmux_t));
 
@@ -39,15 +42,49 @@ int main(void)
 
     while (1)
     {
-        for (int i = 0; i < leds_count; i++)
+        /* Check button state. SW2 is active/pressed as '0' level.
+         * You have to press button little bit longer - due delay functions. */
+        if (!Board_BTN_GetLevel(ONBOARD_BTN_SW2))
         {
-            Board_LED_Set(leds[i], true);
-            delay(250000);
+            /* use button 'falling edge' as event to switch state */
+            if (btn_active == 0)
+            {
+                state = state == 0 ? 1 : 0;
+            }
+            btn_active = 1;
         }
-        for (int i = 0; i < leds_count; i++)
+        else
         {
-            Board_LED_Set(leds[i], false);
-            delay(250000);
+            btn_active = 0;
+        }
+
+        /* LED blinking */
+        if (0 == state)
+        {
+            for (int i = 0; i < leds_count; i++)
+            {
+                Board_LED_SetLevel(leds[i], true);
+                delay(250000);
+            }
+            for (int i = 0; i < leds_count; i++)
+            {
+                Board_LED_SetLevel(leds[i], false);
+                delay(250000);
+            }
+        }
+        else if (1 == state)
+        {
+            for (int i = 0; i < leds_count; i++)
+            {
+                /* turn off all leds */
+                for (int j = 0; j < leds_count; j++)
+                {
+                    Board_LED_SetLevel(leds[j], false);
+                }
+                /* enable one */
+                Board_LED_SetLevel(leds[i], true);
+                delay(750000);
+            }
         }
     }
 

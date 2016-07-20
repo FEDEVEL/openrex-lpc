@@ -94,7 +94,6 @@ void Board_Debug_Init(void)
 {
 #if defined(DEBUG_ENABLE)
     Board_UART_Init();
-
     /* Setup UART for 115.2K8N1 */
     Chip_UART_Init(LPC_USART);
     Chip_UART_SetBaud(LPC_USART, 115200);
@@ -107,89 +106,76 @@ void Board_Debug_Init(void)
 /* Initializes board LED(s) */
 static void Board_LED_Init(void)
 {
+    pinmux_t leds[] = { ONBOARD_LEDS };
     Chip_GPIO_Init(LPC_GPIO_PORT);
+    for (int i = 0; i < (sizeof(leds)/sizeof(leds[0])); i++)
+    {
+        Chip_GPIO_SetPinDIROutput(LPC_GPIO_PORT, TO_PORT(leds[i]), TO_PIN(leds[i]));
+    }
 }
 
-/* Sets the state of a board LED to on or off */
-void Board_LED_Set(pinmux_t pinmux, bool On)
+/* Initializes board Button(s) */
+static void Board_BTN_Init(void)
 {
-    Chip_GPIO_SetPinDIROutput(LPC_GPIO_PORT, TO_PORT(pinmux), TO_PIN(pinmux));
-    Chip_GPIO_WriteDirBit(LPC_GPIO_PORT, TO_PORT(pinmux), TO_PIN(pinmux), On);
+    pinmux_t buttons[] = { ONBOARD_BTNS };
+    Chip_GPIO_Init(LPC_GPIO_PORT);
+    for (int i = 0; i < (sizeof(buttons)/sizeof(buttons[0])); i++)
+    {
+        Chip_GPIO_SetPinDIRInput(LPC_GPIO_PORT, TO_PORT(buttons[i]), TO_PIN(buttons[i]));
+    }
 }
 
-// /* Returns the current state of a board LED */
-// bool Board_LED_Test(uint8_t LEDNumber)
-// {
-//  bool state = false;
+/* Set the GPIO level of board LED */
+void Board_LED_SetLevel(pinmux_t pinmux, bool high)
+{
+    Chip_GPIO_WriteDirBit(LPC_GPIO_PORT, TO_PORT(pinmux), TO_PIN(pinmux), high);
+}
 
-//  if (LEDNumber == 0) {
-//      state = Chip_GPIO_ReadPortBit(LPC_GPIO_PORT, 0, 7);
-//  }
+/* Get the GPIO level of board LED */
+bool Board_LED_GetLevel(pinmux_t pinmux)
+{
+    return Chip_GPIO_ReadPortBit(LPC_GPIO_PORT, TO_PORT(pinmux), TO_PIN(pinmux));
+}
 
-//  return state;
-// }
+/* Get the GPIO level of board Button */
+bool Board_BTN_GetLevel(pinmux_t pinmux)
+{
+    return Chip_GPIO_ReadPortBit(LPC_GPIO_PORT, TO_PORT(pinmux), TO_PIN(pinmux));
+}
 
-// void Board_LED_Toggle(uint8_t LEDNumber)
-// {
-//  Board_LED_Set(LEDNumber, !Board_LED_Test(LEDNumber));
-// }
+void BOARD_assert(const char *file, const int line)
+{
+    /* NOTE: If LED 24 (the one next to power supply connector) blinks, 
+     * it means that your application has some serious issues */
 
-//  Set up and initialize all required blocks and functions related to the
-//    board hardware 
+    /* IOCON and GPIO doesn't have to be enabled at this point */
+    Chip_Clock_EnablePeriphClock(SYSCTL_CLOCK_IOCON);
+    Chip_GPIO_Init(LPC_GPIO_PORT);
+    /* set mux and output direction */
+    Chip_IOCON_PinMuxSet(LPC_IOCON, TO_PORT(ONBOARD_ASSERT_LED), TO_PIN(ONBOARD_ASSERT_LED), ONBOARDCFG_ASSERT_LED);
+    Chip_GPIO_SetPinDIROutput(LPC_GPIO_PORT, TO_PORT(ONBOARD_ASSERT_LED), TO_PIN(ONBOARD_ASSERT_LED));
+    /* blink forever. the speed depends on core clock settings */
+    for (volatile int i = 1; i; )
+    {
+        Board_LED_SetLevel(ONBOARD_ASSERT_LED, true);
+        for (volatile int k = 500000; k; k--) __asm("nop");
+        Board_LED_SetLevel(ONBOARD_ASSERT_LED, false);
+        for (volatile int k = 500000; k; k--) __asm("nop");
+    }
+}
+
+/* Set up common peripherals */
 void Board_Init(void)
 {
     /* Sets up DEBUG UART */
     DEBUGINIT();
 
-//  /* Initialize GPIO */
-//  Chip_GPIO_Init(LPC_GPIO_PORT);
+    /* Initialize GPIO */
+    Chip_GPIO_Init(LPC_GPIO_PORT);
 
     /* Initialize LEDs */
     Board_LED_Init();
+
+    /* Initialize BTNs */
+    Board_BTN_Init();
 }
-
-// /* Initialize pin muxing for SSP interface */
-// void Board_SSP_Init(LPC_SSP_T *pSSP)
-// {
-//  Chip_IOCON_PinLocSel(LPC_IOCON, IOCON_SCKLOC_PIO2_11);
-// }
-
-// /* Configure pin for ADC channel 0 */
-// void Board_ADC_Init(void)
-// {
-//  /* Muxing already setup as part of SystemInit for AD0 */
-// }
-
-// /* Initialize buttons on the board */
-// void Board_Buttons_Init(void)
-// {
-//  Chip_GPIO_WriteDirBit(LPC_GPIO_PORT, BUTTONS_BUTTON1_GPIO_PORT_NUM, BUTTONS_BUTTON1_GPIO_BIT_NUM, false);
-// }
-
-
-
-// /* Initialize Joystick */
-// void Board_Joystick_Init(void)
-// {
-//  int ix;
-
-//  for (ix = 0; ix < NUM_BUTTONS; ix++) {
-//      Chip_IOCON_PinMuxSet(LPC_IOCON, (CHIP_IOCON_PIO_T) portButton[ix], (IOCON_FUNC0 | IOCON_MODE_PULLUP));
-//      Chip_GPIO_WriteDirBit(LPC_GPIO_PORT, portButton[ix], pinButton[ix], false);
-//  }
-// }
-
-// /* Get Joystick status */
-// uint8_t Joystick_GetStatus(void)
-// {
-//  uint8_t ix, ret = 0;
-
-//  for (ix = 0; ix < NUM_BUTTONS; ix++) {
-//      if ((Chip_GPIO_GetPinState(LPC_GPIO_PORT, portButton[ix], pinButton[ix])) == false) {
-//          ret |= stateButton[ix];
-//      }
-//  }
-
-//  return ret;
-// }
-

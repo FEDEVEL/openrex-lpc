@@ -116,39 +116,6 @@ int Board_UARTGetChar(void);
 void Board_UARTPutSTR(char *str);
 
 /**
- * @brief	Sets the state of a board LED to on or off
- * @param	LEDNumber	: LED number to set state for
- * @param	State		: true for on, false for off
- * @return	None
- */
-void Board_LED_Set(pinmux_t pinmux, bool State);
-
-/**
- * @brief	Returns the current state of a board LED
- * @param	LEDNumber	: LED number to set state for
- * @return	true if the LED is on, otherwise false
- */
-bool Board_LED_Test(pinmux_t pinmux);
-
-/**
- * @brief	Toggles the current state of a board LED
- * @param	LEDNumber	: LED number to change state for
- * @return	None
- */
-void Board_LED_Toggle(pinmux_t pinmux);
-
-/**
- * @brief	Turn on Board LCD Backlight
- * @param	Intensity	: Backlight intensity (0 = off, >=1 = on)
- * @return	None
- * @note	On boards where a GPIO is used to control backlight on/off state, a '0' or '1'
- * value will turn off or on the backlight. On some boards, a non-0 value will
- * control backlight intensity via a PWN. For PWM systems, the intensity value
- * is a percentage value between 0 and 100%.
- */
-void Board_SetLCDBacklight(uint8_t Intensity);
-
-/**
  * @brief Function prototype for a MS delay function. Board layers or example code may
  *        define this function as needed.
  */

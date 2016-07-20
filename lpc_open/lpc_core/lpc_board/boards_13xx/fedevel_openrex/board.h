@@ -64,8 +64,8 @@ extern "C" {
     is also the port used for Board_UARTPutChar, Board_UARTGetChar, and
     Board_UARTPutSTR functions.
  */
-#define DEBUG_UART 	LPC_USART
-#define EOF 		(-1)
+#define DEBUG_UART  LPC_USART
+#define EOF         (-1)
 
 /**
  * @}
@@ -73,7 +73,6 @@ extern "C" {
  
  /* Board name */
 #define BOARD_FEDEVEL_OPENREX
-
 
 /**
  * LED defines
@@ -91,12 +90,19 @@ extern "C" {
 /* LED 4 is not connected by default */
 // #define ONBOARD_LED_D4          (TO_PINMUX(1, 19))
 // #define ONBOARDCF_LED_D4        (IOCON_FUNC0 | IOCON_MODE_PULLUP | IOCON_RESERVED_BIT_7)
+
+/* please do not use LED 24. it's reserved for assertion */
 #define ONBOARD_LED_D24         (TO_PINMUX(0, 1))
 #define ONBOARDCF_LED_D24       (IOCON_FUNC0 | IOCON_MODE_PULLDOWN | IOCON_RESERVED_BIT_7)
+#define ONBOARD_ASSERT_LED      (ONBOARD_LED_D24)
+#define ONBOARDCFG_ASSERT_LED   (ONBOARDCF_LED_D24)
 
-// #define ONBOARD_LEDS            ONBOARD_LED_D1, ONBOARD_LED_D2, ONBOARD_LED_D3, ONBOARD_LED_D4, ONBOARD_LED_D24
-#define ONBOARD_LEDS            ONBOARD_LED_D1, ONBOARD_LED_D2, ONBOARD_LED_D3, ONBOARD_LED_D24
+/* list of all available leds */
+#define ONBOARD_LEDS            ONBOARD_LED_D1, ONBOARD_LED_D2, ONBOARD_LED_D3
 
+/**
+ * SPI defines
+ */
 #define ONBOARD_SPI0_CS         (TO_PINMUX(0, 2))
 #define ONBOARDCF_SPI0_CS       (IOCON_FUNC1 | IOCON_MODE_PULLUP | IOCON_RESERVED_BIT_7)
 #define ONBOARD_SPI0_MISO       (TO_PINMUX(0, 8))
@@ -106,46 +112,37 @@ extern "C" {
 #define ONBOARD_SPI0_SCK        (TO_PINMUX(0, 10))
 #define ONBOARDCF_SPI0_SCK      (IOCON_FUNC2 | IOCON_MODE_INACT | IOCON_RESERVED_BIT_7)
 
+/**
+ * UART defines
+ */
 #define ONBOARD_UART_RX         (TO_PINMUX(0, 18))
 #define ONBOARDCF_UART_RX       (IOCON_FUNC1 | IOCON_MODE_INACT | IOCON_RESERVED_BIT_7)
 #define ONBOARD_UART_TX         (TO_PINMUX(0, 19))
 #define ONBOARDCF_UART_TX       (IOCON_FUNC1 | IOCON_MODE_INACT | IOCON_RESERVED_BIT_7)
 
-
 /**
- * @brief   Sets up board specific ADC interface
- * @return  Nothing
+ * BTN defines
  */
-// void Board_ADC_Init(void);
+#define ONBOARD_BTN_SW2         (TO_PINMUX(1, 19))
+#define ONBOARDCF_BTN_SW2       (IOCON_FUNC0 | IOCON_MODE_PULLUP | IOCON_HYS_EN | IOCON_RESERVED_BIT_7)
 
-/**
- * @brief   Initialize pin muxing for SSP interface
- * @param   pSSP    : Pointer to SSP interface to initialize
- * @return  Nothing
- */
-// void Board_SSP_Init(LPC_SSP_T *pSSP);
-
-
-
-/**
- * @brief   Sets up board specific ADC interface
- * @return  Nothing
- */
-// void Board_ADC_Init(void);
-
-/**
- * @brief   Initialize pin muxing for SSP interface
- * @param   pSSP    : Pointer to SSP interface to initialize
- * @return  Nothing
- */
-// void Board_SSP_Init(LPC_SSP_T *pSSP);
-
+/* list of all available buttons */
+#define ONBOARD_BTNS            ONBOARD_BTN_SW2
 
 /**
  * @}
  */
 
 #include "board_api.h"
+
+/* Set the GPIO level of board LED */
+void Board_LED_SetLevel(pinmux_t pinmux, bool high);
+
+/* Get the GPIO level of board LED */
+bool Board_LED_GetLevel(pinmux_t pinmux);
+
+/* Get the GPIO level of board Button */
+bool Board_BTN_GetLevel(pinmux_t pinmux);
 
 #ifdef __cplusplus
 }
