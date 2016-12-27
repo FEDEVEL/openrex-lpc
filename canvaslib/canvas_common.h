@@ -92,6 +92,7 @@ struct cmd_getcolor {
 struct ack_dimension {
     int32_t width;
     int32_t height;
+    uint32_t pixel_bits;
 };
 
 /* dimension acknowledge attributes */

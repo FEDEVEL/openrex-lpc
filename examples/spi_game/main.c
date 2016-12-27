@@ -324,8 +324,8 @@ void reset_objects(
     assert(NULL != player2);
 
     /* ball attributes */
-    ball->y_speed = 4;
-    ball->x_speed = 9;
+    ball->y_speed = 6;
+    ball->x_speed = 13;
     ball->x_move = ball->x_speed;
     ball->y_move = ball->y_speed;
     ball->ball.color = CANVAS_COLOR_WHITE;
@@ -337,7 +337,7 @@ void reset_objects(
     ball->ghost.in_centre = ball->ball.in_centre;
     /* player 1 attributes */
     player1->ctrl_btn = PLAYER1_BTN;
-    player1->y_speed = 4;
+    player1->y_speed = 8;
     player1->plate.width = 10;
     player1->plate.height = 200;
     player1->plate.in_centre = 1;
@@ -348,7 +348,7 @@ void reset_objects(
     player1->ghost.color = CANVAS_COLOR_BLACK;
     /* player 2 attributes */
     player2->ctrl_btn = PLAYER2_BTN;
-    player2->y_speed = 4;
+    player2->y_speed = 8;
     player2->plate.width = 10;
     player2->plate.height = 200;
     player2->plate.in_centre = 1;
